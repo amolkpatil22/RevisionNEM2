@@ -33,14 +33,17 @@ userRoute.post("/register", async (req, res) => {
 userRoute.post("/login", async (req, res) => {
     try {
         let user = await userModel.findOne({ email: req.body.email })
+
         if (user) {
             bcrypt.compare(req.body.password, user.password, (err, result) => {
-                if (err) {
-                    res.status(200).send({ "msg": "login failed" })
-                }
-                else {
+
+                if (result) {
                     let token = jwt.sign({ userID: user._id }, "masai", { expiresIn: "7d" })
                     res.status(200).send({ "msg": "login successful", "token": token, "username": user.username })
+
+                }
+                else {
+                    res.status(200).send({ "msg": "login failed" })
                 }
             })
         }
